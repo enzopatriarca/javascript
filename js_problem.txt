@@ -1,0 +1,121 @@
+Você deve implementar uma função com assinatura main(minimum, callbackDelayPairs), onde minimum é um número e callbackDelayPairs é uma lista de listas no formato [callback, delay] onde:
+
+  - callback é uma função assíncrona que possui 2 parâmetros, digamos A e B. Antes de retornar um número X, callback chama A.register(callback, X) ou B.register(callback, X);
+
+  - delay é um número não-negativo.
+
+
+Exemplo de função fornecida em pares de callbackDelayPairs:
+
+async function f(A, B) {
+
+  const X = Math.random()
+
+  if (X >= 0.5) {
+
+	A.register(f, X)
+
+  } else {
+
+	B.register(f, X)
+
+  }
+
+  return new Promise(resolve => {
+
+	setTimeout(() => resolve(X), 500)
+
+  })
+
+}
+
+
+
+Restrição:
+
+Suponha que callbackDelayPairs = [[f0, d0], [f1, d1], ...., [f99, f99]].
+
+Imagine que um cronômetro é iniciado ao mesmo tempo que f0 é chamado. f1 deve ser chamado assim que as duas condições seguintes forem satisfeitas:
+
+  1. d0 milissegundos se passaram desde que o cronômetro foi iniciado.
+
+  2. f0 retornou.
+
+Pode ser que uma das condições leve mais tempo que a outra para ser satisfeita, mas f1 só deve ser chamado após ambas serem satisfeitas.
+
+De forma semelhante, f2 deve ser chamado imediatamente após f1 ter retornado e pelo menos d1 milissegundos terem passado desde que f1 foi chamado.
+
+E assim por diante até f99.
+
+
+
+A função main poderá receber callbackDelayPairs com qualquer tamanho possível (até zero) e deverá chamar as funções em callbackDelayPairs de acordo com a regra descrita acima:
+
+Exceto a função com índice 0 (por não possuir uma função anterior), toda função com índice i deve ser chamada imediatamente após a função anterior, com índice i-1, ter retornado e o tempo passado desde que a função anterior foi chamada seja maior ou igual ao delay com índice i-1.
+
+
+Obs: Tecnicamente falando, uma função assíncrona retorna uma promise quase imediatamente. Então, para deixar o texto mais simples, foi dito que deve se esperar um callback retornar para chamar o próximo callback, mas a intenção é que deve se esperar que a promise retornada por um callback seja resolvida para chamar o próximo callback.
+
+
+
+Descrição do output:
+
+main deve retornar um objeto no formato {all, filtered}, onde:
+
+  - all é a lista de pares [callback, X] para cada chamada feita ao método register (em qualquer objeto) com argumentos callback e X; ou seja, uma lista de pares onde cada par é um dos callbacks e seu valor de retorno;
+
+  - filtered é a lista de todos os elementos de all ordenados decrescentemente pelo valor de retorno dos callbacks e com os valores de retorno maiores ou iguais a minimum.
+
+
+Exemplo:
+
+Input:
+
+async function f1(A, B) {
+
+  A.register(f1, 4)
+
+  return 4
+
+}
+
+async function f2(A, B) {
+
+  B.register(f2, 5)
+
+  return 5
+
+}
+
+async function f3(A, B) {
+
+  A.register(f3, 20)
+
+  return 20
+
+}
+
+
+minimum = 5
+
+callbackDelayPairs = [
+
+  [f1, 100],
+
+  [f2, 0],
+
+  [f3, 5000],
+
+]
+
+
+Output:
+
+{
+
+  all: [[f1, 4], [f2, 5], [f3, 20]],
+
+  filtered: [[f3, 20], [f2, 5]],
+
+}
+
